@@ -23,6 +23,7 @@
     },
     "scripts": {
         "tests": [
+            "php ./vendor/vimeo/psalm/bin/psalm",
             "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run"
         ]
     },
@@ -31,6 +32,7 @@
         "ext-gd": "^7.0"
     },
     "require-dev": {
-        "signpostmarv/php-cs-fixer-config": "^0.3.0"
+        "signpostmarv/php-cs-fixer-config": "^0.3.0",
+        "vimeo/psalm": "dev-master"
     }
 }
