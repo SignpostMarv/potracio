@@ -884,18 +884,35 @@ class Potracio
             }
         };
 
-        $smooth = function (&$path) use ($mod, $interval, $ddenom, $dpara, $info) {
+        $smooth = function (
+            &$path
+        ) use (
+            $mod,
+            $interval,
+            $ddenom,
+            $dpara,
+            $info
+        ) {
             $m = $path->curve->n;
             $curve = &$path->curve;
 
             for ($i = 0; $i < $m; ++$i) {
                 $j = $mod($i + 1, $m);
                 $k = $mod($i + 2, $m);
-                $p4 = $interval(1 / 2.0, $curve->vertex[$k], $curve->vertex[$j]);
+                $p4 = $interval(
+                    1 / 2.0,
+                    $curve->vertex[$k],
+                    $curve->vertex[$j]
+                );
 
                 $denom = $ddenom($curve->vertex[$i], $curve->vertex[$k]);
                 if (0.0 !== $denom) {
-                    $dd = $dpara($curve->vertex[$i], $curve->vertex[$j], $curve->vertex[$k]) / $denom;
+                    $dd =
+                        $dpara(
+                            $curve->vertex[$i],
+                            $curve->vertex[$j],
+                            $curve->vertex[$k]
+                        ) / $denom;
                     $dd = abs($dd);
                     $alpha = $dd > 1 ? (1 - 1.0 / $dd) : 0;
                     $alpha = $alpha / 0.75;
@@ -914,8 +931,16 @@ class Potracio
                     } elseif ($alpha > 1) {
                         $alpha = 1;
                     }
-                    $p2 = $interval(0.5 + 0.5 * $alpha, $curve->vertex[$i], $curve->vertex[$j]);
-                    $p3 = $interval(0.5 + 0.5 * $alpha, $curve->vertex[$k], $curve->vertex[$j]);
+                    $p2 = $interval(
+                        0.5 + 0.5 * $alpha,
+                        $curve->vertex[$i],
+                        $curve->vertex[$j]
+                    );
+                    $p3 = $interval(
+                        0.5 + 0.5 * $alpha,
+                        $curve->vertex[$k],
+                        $curve->vertex[$j]
+                    );
                     $curve->tag[$j] = 'CURVE';
                     $curve->c[3 * $j + 0] = $p2;
                     $curve->c[3 * $j + 1] = $p3;
