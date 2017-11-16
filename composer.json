@@ -1,0 +1,28 @@
+{
+    "name": "signpostmarv/potracio",
+    "description": "Potracio - Port by Otamay",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name":  "Otamay",
+            "email": "Matt.Pikaflash@gmail.com"
+        },
+        {
+            "name": "SignpostMarv",
+            "email": "me@signpostmarv.name"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Potracio\\": "./src/"
+        }
+    },
+    "config": {
+        "classmap-authoritative": true,
+        "sort-packages": true
+    },
+    "require": {
+        "php": "^7.0",
+        "ext-gd": "^7.0"
+    }
+}
