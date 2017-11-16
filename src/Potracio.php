@@ -44,11 +44,13 @@ class Potracio
     public $imgCanvas;
     public $bm = null;
     public $pathlist = [];
-    public $info = ['turnpolicy' => 'minority',
-                                             'turdsize' => 2,
-                                             'optcurve' => true,
-                                             'alphamax' => 1,
-                                             'opttolerance' => 0.2, ];
+    public $info = [
+        'turnpolicy' => 'minority',
+        'turdsize' => 2,
+        'optcurve' => true,
+        'alphamax' => 1,
+        'opttolerance' => 0.2,
+    ];
 
     public function __construct()
     {
