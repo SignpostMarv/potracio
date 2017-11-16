@@ -927,8 +927,39 @@ class Potracio
             $curve->alphacurve = 1;
         };
 
-        $optiCurve = function (&$path) use ($mod, $ddist, $sign, $cprod, $dpara, $interval, $tangent, $bezier, $iprod, $iprod1, $info) {
-            $opti_penalty = function ($path, $i, $j, $res, $opttolerance, $convc, $areac) use ($mod, $ddist, $sign, $cprod, $dpara, $interval, $tangent, $bezier, $iprod, $iprod1) {
+        $optiCurve = function (&$path) use (
+            $mod,
+            $ddist,
+            $sign,
+            $cprod,
+            $dpara,
+            $interval,
+            $tangent,
+            $bezier,
+            $iprod,
+            $iprod1,
+            $info
+        ) {
+            $opti_penalty = function (
+                $path,
+                $i,
+                $j,
+                $res,
+                $opttolerance,
+                $convc,
+                $areac
+            ) use (
+                $mod,
+                $ddist,
+                $sign,
+                $cprod,
+                $dpara,
+                $interval,
+                $tangent,
+                $bezier,
+                $iprod,
+                $iprod1
+            ) {
                 $m = $path->curve->n;
                 $curve = $path->curve;
                 $vertex = $curve->vertex;
@@ -950,12 +981,30 @@ class Potracio
                     if ($convc[$k1] !== $conv) {
                         return 1;
                     }
-                    if ($sign($cprod($vertex[$i], $vertex[$i1], $vertex[$k1], $vertex[$k2])) !==
-                        $conv) {
+                    if (
+                        $sign(
+                            $cprod(
+                                $vertex[$i],
+                                $vertex[$i1],
+                                $vertex[$k1],
+                                $vertex[$k2]
+                            )
+                        ) !== $conv
+                    ) {
                         return 1;
                     }
-                    if ($iprod1($vertex[$i], $vertex[$i1], $vertex[$k1], $vertex[$k2]) <
-                        $d * $ddist($vertex[$k1], $vertex[$k2]) * -0.999847695156) {
+                    if (
+                        $iprod1(
+                            $vertex[$i],
+                            $vertex[$i1],
+                            $vertex[$k1],
+                            $vertex[$k2]
+                        ) < (
+                            $d *
+                            $ddist($vertex[$k1], $vertex[$k2]) *
+                            -0.999847695156
+                        )
+                    ) {
                         return 1;
                     }
                 }
@@ -966,7 +1015,13 @@ class Potracio
                 $p3 = clone $curve->c[$mod($j, $m) * 3 + 2];
 
                 $area = $areac[$j] - $areac[$i];
-                $area -= $dpara($vertex[0], $curve->c[$i * 3 + 2], $curve->c[$j * 3 + 2]) / 2;
+                $area -=
+                    $dpara(
+                        $vertex[0],
+                        $curve->c[$i * 3 + 2],
+                        $curve->c[$j * 3 + 2]
+                    ) / 2;
+
                 if ($i >= $j) {
                     $area += $areac[$m];
                 }
@@ -1005,7 +1060,14 @@ class Potracio
 
                 for ($k = $mod($i + 1, $m); $k !== $j; $k = $k1) {
                     $k1 = $mod($k + 1, $m);
-                    $t = $tangent($p0, $p1, $p2, $p3, $vertex[$k], $vertex[$k1]);
+                    $t = $tangent(
+                        $p0,
+                        $p1,
+                        $p2,
+                        $p3,
+                        $vertex[$k],
+                        $vertex[$k1]
+                    );
                     if ($t < -0.5) {
                         return 1;
                     }
@@ -1027,7 +1089,14 @@ class Potracio
 
                 for ($k = $i; $k !== $j; $k = $k1) {
                     $k1 = $mod($k + 1, $m);
-                    $t = $tangent($p0, $p1, $p2, $p3, $curve->c[$k * 3 + 2], $curve->c[$k1 * 3 + 2]);
+                    $t = $tangent(
+                        $p0,
+                        $p1,
+                        $p2,
+                        $p3,
+                        $curve->c[$k * 3 + 2],
+                        $curve->c[$k1 * 3 + 2]
+                    );
                     if ($t < -0.5) {
                         return 1;
                     }
@@ -1036,8 +1105,18 @@ class Potracio
                     if (0.0 === $d) {
                         return 1;
                     }
-                    $d1 = $dpara($curve->c[$k * 3 + 2], $curve->c[$k1 * 3 + 2], $pt) / $d;
-                    $d2 = $dpara($curve->c[$k * 3 + 2], $curve->c[$k1 * 3 + 2], $vertex[$k1]) / $d;
+                    $d1 =
+                        $dpara(
+                            $curve->c[$k * 3 + 2],
+                            $curve->c[$k1 * 3 + 2],
+                            $pt
+                        ) / $d;
+                    $d2 =
+                        $dpara(
+                            $curve->c[$k * 3 + 2],
+                            $curve->c[$k1 * 3 + 2],
+                            $vertex[$k1]
+                        ) / $d;
                     $d2 *= 0.75 * $curve->alpha[$k1];
                     if ($d2 < 0) {
                         $d1 = -$d1;
@@ -1068,7 +1147,13 @@ class Potracio
 
             for ($i = 0; $i < $m; ++$i) {
                 if ('CURVE' === $curve->tag[$i]) {
-                    $convc[$i] = $sign($dpara($vert[$mod($i - 1, $m)], $vert[$i], $vert[$mod($i + 1, $m)]));
+                    $convc[$i] = $sign(
+                        $dpara(
+                            $vert[$mod($i - 1, $m)],
+                            $vert[$i],
+                            $vert[$mod($i + 1, $m)]
+                        )
+                    );
                 } else {
                     $convc[$i] = 0;
                 }
@@ -1081,9 +1166,23 @@ class Potracio
                 $i1 = $mod($i + 1, $m);
                 if ('CURVE' === $curve->tag[$i1]) {
                     $alpha = $curve->alpha[$i1];
-                    $area += 0.3 * $alpha * (4 - $alpha) *
-                    $dpara($curve->c[$i * 3 + 2], $vert[$i1], $curve->c[$i1 * 3 + 2]) / 2;
-                    $area += $dpara($p0, $curve->c[$i * 3 + 2], $curve->c[$i1 * 3 + 2]) / 2;
+                    $area +=
+                        0.3 *
+                        $alpha *
+                        (4 - $alpha) *
+                        $dpara(
+                            $curve->c[$i * 3 + 2],
+                            $vert[$i1],
+                            $curve->c[$i1 * 3 + 2]
+                        ) /
+                        2;
+                    $area +=
+                        $dpara(
+                            $p0,
+                            $curve->c[$i * 3 + 2],
+                            $curve->c[$i1 * 3 + 2]
+                        ) /
+                        2;
                 }
                 $areac[$i + 1] = $area;
             }
@@ -1098,13 +1197,25 @@ class Potracio
                 $len[$j] = $len[$j - 1] + 1;
 
                 for ($i = $j - 2; $i >= 0; --$i) {
-                    $r = $opti_penalty($path, $i, $mod($j, $m), $o, $info->opttolerance, $convc,
-                                                         $areac);
+                    $r = $opti_penalty(
+                        $path,
+                        $i,
+                        $mod($j, $m),
+                        $o,
+                        $info->opttolerance,
+                        $convc,
+                        $areac
+                    );
                     if ($r) {
                         break;
                     }
-                    if ($len[$j] > $len[$i] + 1 ||
-                            ($len[$i] + 1 === $len[$j] && $pen[$j] > $pen[$i] + $o->pen)) {
+                    if (
+                        $len[$j] > $len[$i] + 1 ||
+                        (
+                            $len[$i] + 1 === $len[$j] &&
+                            $pen[$j] > $pen[$i] + $o->pen
+                        )
+                    ) {
                         $pt[$j] = $i;
                         $pen[$j] = $pen[$i] + $o->pen;
                         $len[$j] = $len[$i] + 1;
@@ -1135,8 +1246,11 @@ class Potracio
                     $ocurve->c[$i * 3 + 0] = $opt[$j]->c[0];
                     $ocurve->c[$i * 3 + 1] = $opt[$j]->c[1];
                     $ocurve->c[$i * 3 + 2] = $curve->c[$mod($j, $m) * 3 + 2];
-                    $ocurve->vertex[$i] = $interval($opt[$j]->s, $curve->c[$mod($j, $m) * 3 + 2],
-                                                                                    $vert[$mod($j, $m)]);
+                    $ocurve->vertex[$i] = $interval(
+                        $opt[$j]->s,
+                        $curve->c[$mod($j, $m) * 3 + 2],
+                        $vert[$mod($j, $m)]
+                    );
                     $ocurve->alpha[$i] = $opt[$j]->alpha;
                     $ocurve->alpha0[$i] = $opt[$j]->alpha;
                     $s[$i] = $opt[$j]->s;
@@ -1171,7 +1285,7 @@ class Potracio
 
             $smooth($path);
 
-            if ($info->optcurve) {
+            if ($info['optcurve']) {
                 $optiCurve($path);
             }
         }
