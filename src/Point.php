@@ -1,5 +1,8 @@
 <?php
-
+/**
+* @author Otamay
+* @author SignpostMarv
+*/
 declare(strict_types=1);
 
 namespace Potracio;
