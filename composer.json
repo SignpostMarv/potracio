@@ -21,8 +21,16 @@
         "classmap-authoritative": true,
         "sort-packages": true
     },
+    "scripts": {
+        "tests": [
+            "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run"
+        ]
+    },
     "require": {
         "php": "^7.0",
         "ext-gd": "^7.0"
+    },
+    "require-dev": {
+        "signpostmarv/php-cs-fixer-config": "^0.3.0"
     }
 }
