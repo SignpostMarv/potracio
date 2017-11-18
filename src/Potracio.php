@@ -111,28 +111,49 @@ class Potracio
         $pathlist = &$this->pathlist;
         $path = function (Curve $curve) use ($size) : string {
             $bezier = function (int $i) use ($curve, $size) : string {
-                $b = 'C ' . number_format($curve->c[$i * 3 + 0]->x * $size, 3) . ' ' .
-                         number_format($curve->c[$i * 3 + 0]->y * $size, 3) . ',';
-                $b .= number_format($curve->c[$i * 3 + 1]->x * $size, 3) . ' ' .
-                            number_format($curve->c[$i * 3 + 1]->y * $size, 3) . ',';
-                $b .= number_format($curve->c[$i * 3 + 2]->x * $size, 3) . ' ' .
-                            number_format($curve->c[$i * 3 + 2]->y * $size, 3) . ' ';
+                $b =
+                    'C ' .
+                    number_format($curve->c[$i * 3 + 0]->x * $size, 3) .
+                    ' ' .
+                    number_format($curve->c[$i * 3 + 0]->y * $size, 3) .
+                    ',';
+                $b .=
+                    number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
+                    ' ' .
+                    number_format($curve->c[$i * 3 + 1]->y * $size, 3) .
+                    ',';
+                $b .=
+                    number_format($curve->c[$i * 3 + 2]->x * $size, 3) .
+                    ' ' .
+                    number_format($curve->c[$i * 3 + 2]->y * $size, 3) .
+                    ' ';
 
                 return $b;
             };
 
             $segment = function (int $i) use ($curve, $size) : string {
-                $s = 'L ' . number_format($curve->c[$i * 3 + 1]->x * $size, 3) . ' ' .
-                         number_format($curve->c[$i * 3 + 1]->y * $size, 3) . ' ';
-                $s .= number_format($curve->c[$i * 3 + 2]->x * $size, 3) . ' ' .
-                            number_format($curve->c[$i * 3 + 2]->y * $size, 3) . ' ';
+                $s =
+                    'L ' .
+                    number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
+                    ' ' .
+                    number_format($curve->c[$i * 3 + 1]->y * $size, 3) .
+                    ' ';
+                $s .=
+                    number_format($curve->c[$i * 3 + 2]->x * $size, 3) .
+                    ' ' .
+                    number_format($curve->c[$i * 3 + 2]->y * $size, 3) .
+                    ' ';
 
                 return $s;
             };
 
             $n = $curve->n;
-            $p = 'M' . number_format($curve->c[($n - 1) * 3 + 2]->x * $size, 3) .
-                     ' ' . number_format($curve->c[($n - 1) * 3 + 2]->y * $size, 3) . ' ';
+            $p =
+                'M' .
+                number_format($curve->c[($n - 1) * 3 + 2]->x * $size, 3) .
+                ' ' .
+                number_format($curve->c[($n - 1) * 3 + 2]->y * $size, 3) .
+                ' ';
 
             for ($i = 0; $i < $n; ++$i) {
                 if ('CURVE' === $curve->tag[$i]) {
@@ -149,8 +170,12 @@ class Potracio
         $h = $bm->h * $size;
         $len = count($pathlist);
 
-        $svg = '<svg id="svg" version="1.1" width="' . $w . '" height="' . $h .
-                     '" xmlns="http://www.w3.org/2000/svg">';
+        $svg =
+            '<svg id="svg" version="1.1" width="' .
+            $w .
+            '" height="' .
+            $h .
+            '" xmlns="http://www.w3.org/2000/svg">';
         $svg .= '<path d="';
         for ($i = 0; $i < $len; ++$i) {
             /**
@@ -168,7 +193,14 @@ class Potracio
             $fillc = 'black';
             $fillrule = ' fill-rule="evenodd"';
         }
-        $svg .= '" stroke="' . $strokec . '" fill="' . $fillc . '"' . $fillrule . '/></svg>';
+        $svg .=
+            '" stroke="' .
+            $strokec .
+            '" fill="' .
+            $fillc .
+            '"' .
+            $fillrule .
+            '/></svg>';
 
         return $svg;
     }
@@ -203,10 +235,34 @@ class Potracio
             for ($i = 2; $i < 5; ++$i) {
                 $ct = 0;
                 for ($a = -$i + 1; $a <= $i - 1; ++$a) {
-                    $ct += $bm1->at((int) ($x + $a), (int) ($y + $i - 1)) ? 1 : -1;
-                    $ct += $bm1->at((int) ($x + $i - 1), (int) ($y + $a - 1)) ? 1 : -1;
-                    $ct += $bm1->at((int) ($x + $a - 1), (int) ($y - $i)) ? 1 : -1;
-                    $ct += $bm1->at((int) ($x - $i), (int) ($y + $a)) ? 1 : -1;
+                    $ct +=
+                        $bm1->at(
+                            (int) ($x + $a),
+                            (int) ($y + $i - 1)
+                        )
+                            ? 1
+                            : -1;
+                    $ct +=
+                        $bm1->at(
+                            (int) ($x + $i - 1),
+                            (int) ($y + $a - 1)
+                        )
+                            ? 1
+                            : -1;
+                    $ct +=
+                        $bm1->at(
+                            (int) ($x + $a - 1),
+                            (int) ($y - $i)
+                        )
+                            ? 1
+                            : -1;
+                    $ct +=
+                        $bm1->at(
+                            (int) ($x - $i),
+                            (int) ($y + $a)
+                        )
+                            ? 1
+                            : -1;
                 }
                 if ($ct > 0) {
                     return 1;
@@ -218,7 +274,14 @@ class Potracio
             return 0;
         };
 
-        $findPath = function (Point $point) use ($bm, $bm1, $majority, $info) : Path {
+        $findPath = function (
+            Point $point
+        ) use (
+            $bm,
+            $bm1,
+            $majority,
+            $info
+        ) : Path {
             $path = new Path();
             $x = $point->x;
             $y = $point->y;
@@ -251,15 +314,35 @@ class Potracio
                     break;
                 }
 
-                $l = $bm1->at((int) ($x + ($dirx + $diry - 1) / 2), (int) ($y + ($diry - $dirx - 1) / 2));
-                $r = $bm1->at((int) ($x + ($dirx - $diry - 1) / 2), (int) ($y + ($diry + $dirx - 1) / 2));
+                $l = $bm1->at(
+                    (int) ($x + ($dirx + $diry - 1) / 2),
+                    (int) ($y + ($diry - $dirx - 1) / 2)
+                );
+                $r = $bm1->at(
+                    (int) ($x + ($dirx - $diry - 1) / 2),
+                    (int) ($y + ($diry + $dirx - 1) / 2)
+                );
 
                 if ($r && ! $l) {
-                    if ('right' === $info['turnpolicy'] ||
-                                                                        ('black' === $info['turnpolicy'] && '+' === $path->sign) ||
-                                                                        ('white' === $info['turnpolicy'] && '-' === $path->sign) ||
-                                                                        ('majority' === $info['turnpolicy'] && $majority($x, $y)) ||
-                                                                        ('minority' === $info['turnpolicy'] && ! $majority($x, $y))) {
+                    if (
+                        'right' === $info['turnpolicy'] ||
+                        (
+                            'black' === $info['turnpolicy'] &&
+                            '+' === $path->sign
+                        ) ||
+                        (
+                            'white' === $info['turnpolicy'] &&
+                            '-' === $path->sign
+                        ) ||
+                        (
+                            'majority' === $info['turnpolicy'] &&
+                            $majority($x, $y)
+                        ) ||
+                        (
+                            'minority' === $info['turnpolicy'] &&
+                            ! $majority($x, $y)
+                        )
+                    ) {
                         $tmp = $dirx;
                         $dirx = -$diry;
                         $diry = $tmp;
@@ -321,7 +404,10 @@ class Potracio
         $info = $this->info;
 
         $mod = function (float $a, int $n) : float {
-            return $a >= $n ? $a % $n : ($a >= 0 ? $a : $n - 1 - (-1 - $a) % $n);
+            return
+                $a >= $n
+                    ? $a % $n
+                    : ($a >= 0 ? $a : $n - 1 - (-1 - $a) % $n);
         };
 
         $xprod = function (Point $p1, Point $p2) : float {
@@ -418,20 +504,66 @@ class Potracio
         };
 
         $ddist = function (Point $p, Point $q) : float {
-            return sqrt(($p->x - $q->x) * ($p->x - $q->x) + ($p->y - $q->y) * ($p->y - $q->y));
+            return sqrt(
+                ($p->x - $q->x) *
+                ($p->x - $q->x) +
+                ($p->y - $q->y) *
+                ($p->y - $q->y)
+            );
         };
 
-        $bezier = function (float $t, Point $p0, Point $p1, Point $p2, Point $p3) : Point {
+        $bezier = function (
+            float $t,
+            Point $p0,
+            Point $p1,
+            Point $p2,
+            Point $p3
+        ) : Point {
             $s = 1 - $t;
             $res = new Point();
 
-            $res->x = $s * $s * $s * $p0->x + 3 * ($s * $s * $t) * $p1->x + 3 * ($t * $t * $s) * $p2->x + $t * $t * $t * $p3->x;
-            $res->y = $s * $s * $s * $p0->y + 3 * ($s * $s * $t) * $p1->y + 3 * ($t * $t * $s) * $p2->y + $t * $t * $t * $p3->y;
+            $res->x =
+                $s *
+                $s *
+                $s *
+                $p0->x +
+                3 *
+                ($s * $s * $t) *
+                $p1->x +
+                3 *
+                ($t * $t * $s) *
+                $p2->x +
+                $t *
+                $t *
+                $t *
+                $p3->x;
+            $res->y =
+                $s *
+                $s *
+                $s *
+                $p0->y +
+                3 *
+                ($s * $s * $t) *
+                $p1->y +
+                3 *
+                ($t * $t * $s) *
+                $p2->y +
+                $t *
+                $t *
+                $t *
+                $p3->y;
 
             return $res;
         };
 
-        $tangent = function (Point $p0, Point $p1, Point $p2, Point $p3, Point $q0, Point $q1) use ($cprod) : float {
+        $tangent = function (
+            Point $p0,
+            Point $p1,
+            Point $p2,
+            Point $p3,
+            Point $q0,
+            Point $q1
+        ) use ($cprod) : float {
             $A = $cprod($p0, $p1, $q0, $q1);
             $B = $cprod($p1, $p2, $q0, $q1);
             $C = $cprod($p2, $p3, $q0, $q1);
@@ -472,8 +604,13 @@ class Potracio
             for ($i = 0; $i < $path->len; ++$i) {
                 $x = $path->pt[$i]->x - $path->x0;
                 $y = $path->pt[$i]->y - $path->y0;
-                $s[] = new Sum($s[$i]->x + $x, $s[$i]->y + $y, $s[$i]->xy + $x * $y,
-                                             $s[$i]->x2 + $x * $x, $s[$i]->y2 + $y * $y);
+                $s[] = new Sum(
+                    $s[$i]->x + $x,
+                    $s[$i]->y + $y,
+                    $s[$i]->xy + $x * $y,
+                    $s[$i]->x2 + $x * $x,
+                    $s[$i]->y2 + $y * $y
+                );
             }
         };
 
@@ -504,8 +641,13 @@ class Potracio
 
             for ($i = $n - 1; $i >= 0; --$i) {
                 $ct[0] = $ct[1] = $ct[2] = $ct[3] = 0;
-                $dir = (3 + 3 * ($pt[$mod($i + 1, $n)]->x - $pt[$i]->x) +
-                                ($pt[$mod($i + 1, $n)]->y - $pt[$i]->y)) / 2;
+                $dir =
+                    (
+                        3 +
+                        3 *
+                        ($pt[$mod($i + 1, $n)]->x - $pt[$i]->x) +
+                        ($pt[$mod($i + 1, $n)]->y - $pt[$i]->y)
+                    ) / 2;
                 ++$ct[$dir];
 
                 $constraint[0]->x = 0;
@@ -517,8 +659,13 @@ class Potracio
                 $k1 = $i;
                 $foundk = 0;
                 while (1) {
-                    $dir = (3 + 3 * $sign($pt[$k]->x - $pt[$k1]->x) +
-                                     $sign($pt[$k]->y - $pt[$k1]->y)) / 2;
+                    $dir =
+                        (
+                            3 +
+                            3 *
+                            $sign($pt[$k]->x - $pt[$k1]->x) +
+                            $sign($pt[$k]->y - $pt[$k1]->y)
+                        ) / 2;
                     ++$ct[$dir];
 
                     if ($ct[0] && $ct[1] && $ct[2] && $ct[3]) {
@@ -530,20 +677,46 @@ class Potracio
                     $cur->x = $pt[$k]->x - $pt[$i]->x;
                     $cur->y = $pt[$k]->y - $pt[$i]->y;
 
-                    if ($xprod($constraint[0], $cur) < 0 || $xprod($constraint[1], $cur) > 0) {
+                    if (
+                        $xprod($constraint[0], $cur) < 0 ||
+                        $xprod($constraint[1], $cur) > 0
+                    ) {
                         break;
                     }
 
-                    if (abs($cur->x) <= 1 && abs($cur->y) <= 1) {
-                    } else {
-                        $off->x = $cur->x + (($cur->y >= 0 && ($cur->y > 0 || $cur->x < 0)) ? 1 : -1);
-                        $off->y = $cur->y + (($cur->x <= 0 && ($cur->x < 0 || $cur->y < 0)) ? 1 : -1);
+                    if (!(abs($cur->x) <= 1 && abs($cur->y) <= 1)) {
+                        $off->x =
+                            $cur->x +
+                            (
+                                ($cur->y >= 0 && ($cur->y > 0 || $cur->x < 0))
+                                    ? 1
+                                    : -1
+                            );
+                        $off->y =
+                            $cur->y +
+                            (
+                                ($cur->x <= 0 && ($cur->x < 0 || $cur->y < 0))
+                                    ? 1
+                                    : -1
+                            );
                         if ($xprod($constraint[0], $off) >= 0) {
                             $constraint[0]->x = $off->x;
                             $constraint[0]->y = $off->y;
                         }
-                        $off->x = $cur->x + (($cur->y <= 0 && ($cur->y < 0 || $cur->x < 0)) ? 1 : -1);
-                        $off->y = $cur->y + (($cur->x >= 0 && ($cur->x > 0 || $cur->y < 0)) ? 1 : -1);
+                        $off->x =
+                            $cur->x +
+                            (
+                                ($cur->y <= 0 && ($cur->y < 0 || $cur->x < 0))
+                                    ? 1
+                                    : -1
+                            );
+                        $off->y =
+                            $cur->y +
+                            (
+                                ($cur->x >= 0 && ($cur->x > 0 || $cur->y < 0))
+                                    ? 1
+                                    : -1
+                            );
                         if ($xprod($constraint[1], $off) <= 0) {
                             $constraint[1]->x = $off->x;
                             $constraint[1]->y = $off->y;
@@ -586,7 +759,11 @@ class Potracio
                 $path->lon[$i] = (int) $j;
             }
 
-            for ($i = $n - 1; $cyclic($mod($i + 1, $n), $j, $path->lon[$i]); --$i) {
+            for (
+                $i = $n - 1;
+                $cyclic($mod($i + 1, $n), $j, $path->lon[$i]);
+                --$i
+            ) {
                 $path->lon[$i] = (int) $j;
             }
         };
@@ -703,7 +880,13 @@ class Potracio
         };
 
         $adjustVertices = function (Path &$path) use ($mod, $quadform) {
-            $pointslope = function (Path $path, float $i, float $j, Point &$ctr, Point &$dir) {
+            $pointslope = function (
+                Path $path,
+                float $i,
+                float $j,
+                Point &$ctr,
+                Point &$dir
+            ) {
                 $n = $path->len;
                 $sums = $path->sums;
                 $r = 0;
@@ -739,7 +922,8 @@ class Potracio
                 $b = ($xy - $x * $y / $k) / $k;
                 $c = ($y2 - $y * $y / $k) / $k;
 
-                $lambda2 = ($a + $c + sqrt(($a - $c) * ($a - $c) + 4 * $b * $b)) / 2;
+                $lambda2 =
+                    ($a + $c + sqrt(($a - $c) * ($a - $c) + 4 * $b * $b)) / 2;
 
                 $a -= $lambda2;
                 $c -= $lambda2;
@@ -800,9 +984,13 @@ class Potracio
                     for ($l = 0; $l < 3; ++$l) {
                         for ($k = 0; $k < 3; ++$k) {
                             if (0 !== $d) {
-                                $q[$i]->data[$l * 3 + $k] = $v[$l] * $v[$k] / $d;
+                                $q[$i]->data[$l * 3 + $k] =
+                                    $v[$l] * $v[$k] / $d;
                             } else {
-                                $q[$i]->data[$l * 3 + $k] = null; // TODO Hack para evitar división por 0
+                                /**
+                                * @todo Hack para evitar división por 0
+                                */
+                                $q[$i]->data[$l * 3 + $k] = null;
                             }
                         }
                     }
@@ -820,15 +1008,32 @@ class Potracio
 
                 for ($l = 0; $l < 3; ++$l) {
                     for ($k = 0; $k < 3; ++$k) {
-                        $Q->data[$l * 3 + $k] = (int) ($q[$j]->at($l, $k) + $q[$i]->at($l, $k));
+                        $Q->data[$l * 3 + $k] =
+                            (int) ($q[$j]->at($l, $k) + $q[$i]->at($l, $k));
                     }
                 }
 
                 while (1) {
-                    $det = $Q->at(0, 0) * $Q->at(1, 1) - $Q->at(0, 1) * $Q->at(1, 0);
+                    $det =
+                        $Q->at(0, 0) *
+                        $Q->at(1, 1) -
+                        $Q->at(0, 1) *
+                        $Q->at(1, 0);
                     if (0.0 !== $det) {
-                        $w->x = (-$Q->at(0, 2) * $Q->at(1, 1) + $Q->at(1, 2) * $Q->at(0, 1)) / $det;
-                        $w->y = ($Q->at(0, 2) * $Q->at(1, 0) - $Q->at(1, 2) * $Q->at(0, 0)) / $det;
+                        $w->x =
+                            (
+                                -$Q->at(0, 2) *
+                                $Q->at(1, 1) +
+                                $Q->at(1, 2) *
+                                $Q->at(0, 1)
+                            ) / $det;
+                        $w->y =
+                            (
+                                $Q->at(0, 2) *
+                                $Q->at(1, 0) -
+                                $Q->at(1, 2) *
+                                $Q->at(0, 0)
+                            ) / $det;
                         break;
                     }
 
@@ -853,7 +1058,10 @@ class Potracio
                 $dx = abs($w->x - $s->x);
                 $dy = abs($w->y - $s->y);
                 if ($dx <= 0.5 && $dy <= 0.5) {
-                    $path->curve->vertex[$i] = new Point($w->x + $x0, $w->y + $y0);
+                    $path->curve->vertex[$i] = new Point(
+                        $w->x + $x0,
+                        $w->y + $y0
+                    );
                     continue;
                 }
 
@@ -864,7 +1072,12 @@ class Potracio
                 if (0.0 !== $Q->at(0, 0)) {
                     for ($z = 0; $z < 2; ++$z) {
                         $w->y = $s->y - 0.5 + $z;
-                        $w->x = -($Q->at(0, 1) * $w->y + $Q->at(0, 2)) / $Q->at(0, 0);
+                        $w->x =
+                            -(
+                                $Q->at(0, 1) *
+                                $w->y +
+                                $Q->at(0, 2)
+                            ) / $Q->at(0, 0);
                         $dx = abs($w->x - $s->x);
                         $cand = $quadform($Q, $w);
                         if ($dx <= 0.5 && $cand < $min) {
@@ -878,7 +1091,12 @@ class Potracio
                 if (0.0 !== $Q->at(1, 1)) {
                     for ($z = 0; $z < 2; ++$z) {
                         $w->x = $s->x - 0.5 + $z;
-                        $w->y = -($Q->at(1, 0) * $w->x + $Q->at(1, 2)) / $Q->at(1, 1);
+                        $w->y =
+                            -(
+                                $Q->at(1, 0) *
+                                $w->x +
+                                $Q->at(1, 2)
+                            ) / $Q->at(1, 1);
                         $dy = abs($w->y - $s->y);
                         $cand = $quadform($Q, $w);
                         if ($dy <= 0.5 && $cand < $min) {
@@ -1360,7 +1578,10 @@ class Potracio
                 if (($s[$i] + $t[$i1]) !== 0) {
                     $ocurve->beta[$i] = $s[$i] / ($s[$i] + $t[$i1]);
                 } else {
-                    $ocurve->beta[$i] = null; // TODO Hack para evitar división por 0
+                    /**
+                    * @todo Hack para evitar división por 0
+                    */
+                    $ocurve->beta[$i] = null;
                 }
             }
             $ocurve->alphaCurve = 1;

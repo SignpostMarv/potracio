@@ -38,8 +38,14 @@ class Bitmap
 
     public function at(int $x, int $y) : bool
     {
-        return ($x >= 0 && $x < $this->w && $y >= 0 && $y < $this->h) &&
-                    1 === $this->data[$this->w * $y + $x];
+        return
+            (
+                $x >= 0 &&
+                $x < $this->w &&
+                $y >= 0 &&
+                $y < $this->h
+            ) &&
+            1 === $this->data[$this->w * $y + $x];
     }
 
     public function index(int $i) : Point
