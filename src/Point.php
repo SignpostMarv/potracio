@@ -21,7 +21,7 @@ class Point
 
     public function __construct(float $x = 0, float $y = 0)
     {
-            $this->x = $x;
-            $this->y = $y;
+        $this->x = $x;
+        $this->y = $y;
     }
 }

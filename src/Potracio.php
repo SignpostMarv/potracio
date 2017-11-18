@@ -188,16 +188,16 @@ class Potracio
             * @return int|Point
             */
             function (Point $point) use ($bm1) {
-            $i = (int) ($bm1->w * $point->y + $point->x);
-            while ($i < $bm1->size && 1 !== $bm1->data[$i]) {
-                ++$i;
-            }
-            if ($i < $bm1->size) {
-                return $bm1->index($i);
-            }
+                $i = (int) ($bm1->w * $point->y + $point->x);
+                while ($i < $bm1->size && 1 !== $bm1->data[$i]) {
+                    ++$i;
+                }
+                if ($i < $bm1->size) {
+                    return $bm1->index($i);
+                }
 
-            return 0;
-        };
+                return 0;
+            };
 
         $majority = function (float $x, float $y) use ($bm1) : int {
             for ($i = 2; $i < 5; ++$i) {
@@ -457,9 +457,9 @@ class Potracio
                 return $r1;
             } elseif ($r2 >= 0 && $r2 <= 1) {
                 return $r2;
-            } else {
-                return -1.0;
             }
+
+            return -1.0;
         };
 
         $calcSums = function (Path &$path) {
@@ -515,7 +515,7 @@ class Potracio
 
                 $k = $nc[$i];
                 $k1 = $i;
-                    $foundk = 0;
+                $foundk = 0;
                 while (1) {
                     $dir = (3 + 3 * $sign($pt[$k]->x - $pt[$k1]->x) +
                                      $sign($pt[$k]->y - $pt[$k1]->y)) / 2;
@@ -820,7 +820,7 @@ class Potracio
 
                 for ($l = 0; $l < 3; ++$l) {
                     for ($k = 0; $k < 3; ++$k) {
-                        $Q->data[$l * 3 + $k] = (int)($q[$j]->at($l, $k) + $q[$i]->at($l, $k));
+                        $Q->data[$l * 3 + $k] = (int) ($q[$j]->at($l, $k) + $q[$i]->at($l, $k));
                     }
                 }
 
@@ -1013,7 +1013,6 @@ class Potracio
             $iprod1,
             $info
         ) {
-
             /**
             * @param int[] $convc
             * @param float[] $areac
@@ -1060,7 +1059,7 @@ class Potracio
                 if (0 === $conv) {
                     return 1;
                 }
-                $d =     $ddist($vertex[$i], $vertex[$i1]);
+                $d = $ddist($vertex[$i], $vertex[$i1]);
                 for ($k = $k1; $k !== $j; $k = $k1) {
                     $k1 = $mod($k + 1, $m);
                     $k2 = $mod($k + 2, $m);
