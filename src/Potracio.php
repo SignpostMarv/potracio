@@ -684,7 +684,7 @@ class Potracio
                         break;
                     }
 
-                    if (!(abs($cur->x) <= 1 && abs($cur->y) <= 1)) {
+                    if ( ! (abs($cur->x) <= 1 && abs($cur->y) <= 1)) {
                         $off->x =
                             $cur->x +
                             (
@@ -987,7 +987,7 @@ class Potracio
                                 $q[$i]->data[$l * 3 + $k] =
                                     $v[$l] * $v[$k] / $d;
                             } else {
-                                /**
+                                /*
                                 * @todo Hack para evitar división por 0
                                 */
                                 $q[$i]->data[$l * 3 + $k] = null;
@@ -1578,7 +1578,7 @@ class Potracio
                 if (($s[$i] + $t[$i1]) !== 0) {
                     $ocurve->beta[$i] = $s[$i] / ($s[$i] + $t[$i1]);
                 } else {
-                    /**
+                    /*
                     * @todo Hack para evitar división por 0
                     */
                     $ocurve->beta[$i] = null;
