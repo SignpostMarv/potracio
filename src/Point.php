@@ -9,16 +9,19 @@ namespace Potracio;
 
 class Point
 {
-    public $x;
-    public $y;
+    /**
+    * @var float
+    */
+    public $x = 0;
 
-    public function __construct($x = null, $y = null)
+    /**
+    * @var float
+    */
+    public $y = 0;
+
+    public function __construct(float $x = 0, float $y = 0)
     {
-        if (null !== $x) {
             $this->x = $x;
-        }
-        if (null !== $y) {
             $this->y = $y;
-        }
     }
 }

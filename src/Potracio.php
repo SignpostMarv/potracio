@@ -40,10 +40,19 @@ namespace Potracio;
 
 class Potracio
 {
-    public $imgElement;
-    public $imgCanvas;
+    /**
+    * @var null|Bitmap
+    */
     public $bm = null;
+
+    /**
+    * @var Path[]
+    */
     public $pathlist = [];
+
+    /**
+    * @var mixed[]
+    */
     public $info = [
         'turnpolicy' => 'minority',
         'turdsize' => 2,
@@ -54,15 +63,15 @@ class Potracio
 
     public function __construct()
     {
-        $this->info = (object) $this->info;
+        $this->info = $this->info;
     }
 
-    public function setParameter($data)
+    public function setParameter(array $data)
     {
-        $this->info = (object) array_merge((array) $this->info, $data);
+        $this->info = array_merge((array) $this->info, $data);
     }
 
-    public function loadImageFromFile($file)
+    public function loadImageFromFile(string $file)
     {
         $image = imagecreatefromjpeg($file);
         list($w, $h) = getimagesize($file);
@@ -93,12 +102,15 @@ class Potracio
         $this->pathlist = [];
     }
 
-    public function getSVG($size, $opt_type = '')
+    public function getSVG(int $size, string $opt_type = '') : string
     {
+        /**
+        * @var Bitmap $bm
+        */
         $bm = &$this->bm;
         $pathlist = &$this->pathlist;
-        $path = function ($curve) use ($size) {
-            $bezier = function ($i) use ($curve, $size) {
+        $path = function (Curve $curve) use ($size) : string {
+            $bezier = function (int $i) use ($curve, $size) : string {
                 $b = 'C ' . number_format($curve->c[$i * 3 + 0]->x * $size, 3) . ' ' .
                          number_format($curve->c[$i * 3 + 0]->y * $size, 3) . ',';
                 $b .= number_format($curve->c[$i * 3 + 1]->x * $size, 3) . ' ' .
@@ -109,7 +121,7 @@ class Potracio
                 return $b;
             };
 
-            $segment = function ($i) use ($curve, $size) {
+            $segment = function (int $i) use ($curve, $size) : string {
                 $s = 'L ' . number_format($curve->c[$i * 3 + 1]->x * $size, 3) . ' ' .
                          number_format($curve->c[$i * 3 + 1]->y * $size, 3) . ' ';
                 $s .= number_format($curve->c[$i * 3 + 2]->x * $size, 3) . ' ' .
@@ -141,6 +153,9 @@ class Potracio
                      '" xmlns="http://www.w3.org/2000/svg">';
         $svg .= '<path d="';
         for ($i = 0; $i < $len; ++$i) {
+            /**
+            * @var Curve $c
+            */
             $c = $pathlist[$i]->curve;
             $svg .= $path($c);
         }
@@ -161,12 +176,19 @@ class Potracio
     private function bmToPathlist()
     {
         $info = $this->info;
+        /**
+        * @var Bitmap $bm
+        **/
         $bm = &$this->bm;
         $bm1 = clone $bm;
         $currentPoint = new Point(0, 0);
 
-        $findNext = function ($point) use ($bm1) {
-            $i = $bm1->w * $point->y + $point->x;
+        $findNext =
+            /**
+            * @return int|Point
+            */
+            function (Point $point) use ($bm1) {
+            $i = (int) ($bm1->w * $point->y + $point->x);
             while ($i < $bm1->size && 1 !== $bm1->data[$i]) {
                 ++$i;
             }
@@ -177,14 +199,14 @@ class Potracio
             return 0;
         };
 
-        $majority = function ($x, $y) use ($bm1) {
+        $majority = function (float $x, float $y) use ($bm1) : int {
             for ($i = 2; $i < 5; ++$i) {
                 $ct = 0;
                 for ($a = -$i + 1; $a <= $i - 1; ++$a) {
-                    $ct += $bm1->at($x + $a, $y + $i - 1) ? 1 : -1;
-                    $ct += $bm1->at($x + $i - 1, $y + $a - 1) ? 1 : -1;
-                    $ct += $bm1->at($x + $a - 1, $y - $i) ? 1 : -1;
-                    $ct += $bm1->at($x - $i, $y + $a) ? 1 : -1;
+                    $ct += $bm1->at((int) ($x + $a), (int) ($y + $i - 1)) ? 1 : -1;
+                    $ct += $bm1->at((int) ($x + $i - 1), (int) ($y + $a - 1)) ? 1 : -1;
+                    $ct += $bm1->at((int) ($x + $a - 1), (int) ($y - $i)) ? 1 : -1;
+                    $ct += $bm1->at((int) ($x - $i), (int) ($y + $a)) ? 1 : -1;
                 }
                 if ($ct > 0) {
                     return 1;
@@ -196,14 +218,14 @@ class Potracio
             return 0;
         };
 
-        $findPath = function ($point) use ($bm, $bm1, $majority, $info) {
+        $findPath = function (Point $point) use ($bm, $bm1, $majority, $info) : Path {
             $path = new Path();
             $x = $point->x;
             $y = $point->y;
             $dirx = 0;
             $diry = 1;
 
-            $path->sign = $bm->at($point->x, $point->y) ? '+' : '-';
+            $path->sign = $bm->at((int) $point->x, (int) $point->y) ? '+' : '-';
 
             while (1) {
                 $path->pt[] = new Point($x, $y);
@@ -229,15 +251,15 @@ class Potracio
                     break;
                 }
 
-                $l = $bm1->at($x + ($dirx + $diry - 1) / 2, $y + ($diry - $dirx - 1) / 2);
-                $r = $bm1->at($x + ($dirx - $diry - 1) / 2, $y + ($diry + $dirx - 1) / 2);
+                $l = $bm1->at((int) ($x + ($dirx + $diry - 1) / 2), (int) ($y + ($diry - $dirx - 1) / 2));
+                $r = $bm1->at((int) ($x + ($dirx - $diry - 1) / 2), (int) ($y + ($diry + $dirx - 1) / 2));
 
                 if ($r && ! $l) {
-                    if ('right' === $info->turnpolicy ||
-                                                                        ('black' === $info->turnpolicy && '+' === $path->sign) ||
-                                                                        ('white' === $info->turnpolicy && '-' === $path->sign) ||
-                                                                        ('majority' === $info->turnpolicy && $majority($x, $y)) ||
-                                                                        ('minority' === $info->turnpolicy && ! $majority($x, $y))) {
+                    if ('right' === $info['turnpolicy'] ||
+                                                                        ('black' === $info['turnpolicy'] && '+' === $path->sign) ||
+                                                                        ('white' === $info['turnpolicy'] && '-' === $path->sign) ||
+                                                                        ('majority' === $info['turnpolicy'] && $majority($x, $y)) ||
+                                                                        ('minority' === $info['turnpolicy'] && ! $majority($x, $y))) {
                         $tmp = $dirx;
                         $dirx = -$diry;
                         $diry = $tmp;
@@ -260,7 +282,7 @@ class Potracio
             return $path;
         };
 
-        $xorPath = function ($path) use (&$bm1) {
+        $xorPath = function (Path $path) use (&$bm1) {
             $y1 = $path->pt[0]->y;
             $len = $path->len;
 
@@ -280,11 +302,15 @@ class Potracio
         };
 
         while ($currentPoint = $findNext($currentPoint)) {
+            /**
+            * @var Point $currentPoint
+            */
+            $currentPoint = $currentPoint;
             $path = $findPath($currentPoint);
 
             $xorPath($path);
 
-            if ($path->area > $info->turdsize) {
+            if ($path->area > $info['turdsize']) {
                 $this->pathlist[] = $path;
             }
         }
@@ -294,15 +320,15 @@ class Potracio
     {
         $info = $this->info;
 
-        $mod = function ($a, $n) {
+        $mod = function (float $a, int $n) : float {
             return $a >= $n ? $a % $n : ($a >= 0 ? $a : $n - 1 - (-1 - $a) % $n);
         };
 
-        $xprod = function ($p1, $p2) {
+        $xprod = function (Point $p1, Point $p2) : float {
             return $p1->x * $p2->y - $p1->y * $p2->x;
         };
 
-        $cyclic = function ($a, $b, $c) {
+        $cyclic = function (float $a, float $b, float $c) : bool {
             if ($a <= $c) {
                 return $a <= $b && $b < $c;
             }
@@ -310,11 +336,11 @@ class Potracio
             return $a <= $b || $b < $c;
         };
 
-        $sign = function ($i) {
+        $sign = function (float $i) : int {
             return $i > 0 ? 1 : ($i < 0 ? -1 : 0);
         };
 
-        $quadform = function ($Q, $w) {
+        $quadform = function (Quad $Q, Point $w) : float {
             $v = array_fill(0, 3, null);
 
             $v[0] = $w->x;
@@ -331,7 +357,7 @@ class Potracio
             return $sum;
         };
 
-        $interval = function ($lambda, $a, $b) {
+        $interval = function (float $lambda, Point $a, Point $b) : Point {
             $res = new Point();
 
             $res->x = $a->x + $lambda * ($b->x - $a->x);
@@ -340,7 +366,7 @@ class Potracio
             return $res;
         };
 
-        $dorth_infty = function ($p0, $p2) use ($sign) {
+        $dorth_infty = function (Point $p0, Point $p2) use ($sign) : Point {
             $r = new Point();
 
             $r->y = $sign($p2->x - $p0->x);
@@ -349,13 +375,13 @@ class Potracio
             return $r;
         };
 
-        $ddenom = function ($p0, $p2) use ($dorth_infty) {
+        $ddenom = function (Point $p0, Point $p2) use ($dorth_infty) : float {
             $r = $dorth_infty($p0, $p2);
 
             return $r->y * ($p2->x - $p0->x) - $r->x * ($p2->y - $p0->y);
         };
 
-        $dpara = function ($p0, $p1, $p2) {
+        $dpara = function (Point $p0, Point $p1, Point $p2) : float {
             $x1 = $p1->x - $p0->x;
             $y1 = $p1->y - $p0->y;
             $x2 = $p2->x - $p0->x;
@@ -364,7 +390,7 @@ class Potracio
             return $x1 * $y2 - $x2 * $y1;
         };
 
-        $cprod = function ($p0, $p1, $p2, $p3) {
+        $cprod = function (Point $p0, Point $p1, Point $p2, Point $p3) : float {
             $x1 = $p1->x - $p0->x;
             $y1 = $p1->y - $p0->y;
             $x2 = $p3->x - $p2->x;
@@ -373,7 +399,7 @@ class Potracio
             return $x1 * $y2 - $x2 * $y1;
         };
 
-        $iprod = function ($p0, $p1, $p2) {
+        $iprod = function (Point $p0, Point $p1, Point $p2) : float {
             $x1 = $p1->x - $p0->x;
             $y1 = $p1->y - $p0->y;
             $x2 = $p2->x - $p0->x;
@@ -382,7 +408,7 @@ class Potracio
             return $x1 * $x2 + $y1 * $y2;
         };
 
-        $iprod1 = function ($p0, $p1, $p2, $p3) {
+        $iprod1 = function (Point $p0, Point $p1, Point $p2, Point $p3) : float {
             $x1 = $p1->x - $p0->x;
             $y1 = $p1->y - $p0->y;
             $x2 = $p3->x - $p2->x;
@@ -391,11 +417,11 @@ class Potracio
             return $x1 * $x2 + $y1 * $y2;
         };
 
-        $ddist = function ($p, $q) {
+        $ddist = function (Point $p, Point $q) : float {
             return sqrt(($p->x - $q->x) * ($p->x - $q->x) + ($p->y - $q->y) * ($p->y - $q->y));
         };
 
-        $bezier = function ($t, $p0, $p1, $p2, $p3) {
+        $bezier = function (float $t, Point $p0, Point $p1, Point $p2, Point $p3) : Point {
             $s = 1 - $t;
             $res = new Point();
 
@@ -405,7 +431,7 @@ class Potracio
             return $res;
         };
 
-        $tangent = function ($p0, $p1, $p2, $p3, $q0, $q1) use ($cprod) {
+        $tangent = function (Point $p0, Point $p1, Point $p2, Point $p3, Point $q0, Point $q1) use ($cprod) : float {
             $A = $cprod($p0, $p1, $q0, $q1);
             $B = $cprod($p1, $p2, $q0, $q1);
             $C = $cprod($p2, $p3, $q0, $q1);
@@ -436,7 +462,7 @@ class Potracio
             }
         };
 
-        $calcSums = function (&$path) {
+        $calcSums = function (Path &$path) {
             $path->x0 = $path->pt[0]->x;
             $path->y0 = $path->pt[0]->y;
 
@@ -451,13 +477,17 @@ class Potracio
             }
         };
 
-        $calcLon = function (&$path) use ($mod, $xprod, $sign, $cyclic) {
+        $calcLon = function (Path &$path) use ($mod, $xprod, $sign, $cyclic) {
             $n = $path->len;
             $pt = &$path->pt;
             $pivk = array_fill(0, $n, null);
             $nc = array_fill(0, $n, null);
             $ct = array_fill(0, 4, null);
-            $path->lon = array_fill(0, $n, null);
+            /**
+            * @var int[] $lon
+            */
+            $lon = array_fill(0, $n, 0);
+            $path->lon = $lon;
 
             $constraint = [new Point(), new Point()];
             $cur = new Point();
@@ -485,8 +515,8 @@ class Potracio
 
                 $k = $nc[$i];
                 $k1 = $i;
-                while (1) {
                     $foundk = 0;
+                while (1) {
                     $dir = (3 + 3 * $sign($pt[$k]->x - $pt[$k1]->x) +
                                      $sign($pt[$k]->y - $pt[$k1]->y)) / 2;
                     ++$ct[$dir];
@@ -548,21 +578,21 @@ class Potracio
             }
 
             $j = $pivk[$n - 1];
-            $path->lon[$n - 1] = $j;
+            $path->lon[$n - 1] = (int) $j;
             for ($i = $n - 2; $i >= 0; --$i) {
                 if ($cyclic($i + 1, $pivk[$i], $j)) {
                     $j = $pivk[$i];
                 }
-                $path->lon[$i] = $j;
+                $path->lon[$i] = (int) $j;
             }
 
             for ($i = $n - 1; $cyclic($mod($i + 1, $n), $j, $path->lon[$i]); --$i) {
-                $path->lon[$i] = $j;
+                $path->lon[$i] = (int) $j;
             }
         };
 
-        $bestPolygon = function (&$path) use ($mod) {
-            $penalty3 = function ($path, $i, $j) {
+        $bestPolygon = function (Path &$path) use ($mod) {
+            $penalty3 = function (Path $path, int $i, int $j) : float {
                 $n = $path->len;
                 $pt = $path->pt;
                 $sums = $path->sums;
@@ -660,16 +690,20 @@ class Potracio
                 }
             }
             $path->m = $m;
-            $path->po = array_fill(0, $m, null);
+            /**
+            * @var int[] $po
+            */
+            $po = array_fill(0, $m, 0);
+            $path->po = $po;
 
             for ($i = $n, $j = $m - 1; $i > 0; --$j) {
-                $i = $prev[$i];
+                $i = (int) $prev[$i];
                 $path->po[$j] = $i;
             }
         };
 
-        $adjustVertices = function (&$path) use ($mod, $quadform) {
-            $pointslope = function ($path, $i, $j, &$ctr, &$dir) {
+        $adjustVertices = function (Path &$path) use ($mod, $quadform) {
+            $pointslope = function (Path $path, float $i, float $j, Point &$ctr, Point &$dir) {
                 $n = $path->len;
                 $sums = $path->sums;
                 $r = 0;
@@ -786,7 +820,7 @@ class Potracio
 
                 for ($l = 0; $l < 3; ++$l) {
                     for ($k = 0; $k < 3; ++$k) {
-                        $Q->data[$l * 3 + $k] = $q[$j]->at($l, $k) + $q[$i]->at($l, $k);
+                        $Q->data[$l * 3 + $k] = (int)($q[$j]->at($l, $k) + $q[$i]->at($l, $k));
                     }
                 }
 
@@ -872,9 +906,20 @@ class Potracio
             }
         };
 
-        $reverse = function (&$path) {
+        $reverse = function (Path &$path) {
+            /**
+            * @var Curve $curve
+            */
             $curve = &$path->curve;
+
+            /**
+            * @var int $m
+            */
             $m = $curve->n;
+
+            /**
+            * @var Point[]
+            */
             $v = &$curve->vertex;
 
             for ($i = 0, $j = $m - 1; $i < $j; $i++, $j--) {
@@ -885,7 +930,7 @@ class Potracio
         };
 
         $smooth = function (
-            &$path
+            Path &$path
         ) use (
             $mod,
             $interval,
@@ -893,8 +938,11 @@ class Potracio
             $dpara,
             $info
         ) {
-            $m = $path->curve->n;
+            /**
+            * @var Curve $curve
+            */
             $curve = &$path->curve;
+            $m = $curve->n;
 
             for ($i = 0; $i < $m; ++$i) {
                 $j = $mod($i + 1, $m);
@@ -921,7 +969,7 @@ class Potracio
                 }
                 $curve->alpha0[$j] = $alpha;
 
-                if ($alpha >= $info->alphamax) {
+                if ($alpha >= $info['alphamax']) {
                     $curve->tag[$j] = 'CORNER';
                     $curve->c[3 * $j + 1] = $curve->vertex[$j];
                     $curve->c[3 * $j + 2] = $p4;
@@ -949,10 +997,10 @@ class Potracio
                 $curve->alpha[$j] = $alpha;
                 $curve->beta[$j] = 0.5;
             }
-            $curve->alphacurve = 1;
+            $curve->alphaCurve = 1;
         };
 
-        $optiCurve = function (&$path) use (
+        $optiCurve = function (Path &$path) use (
             $mod,
             $ddist,
             $sign,
@@ -965,14 +1013,19 @@ class Potracio
             $iprod1,
             $info
         ) {
+
+            /**
+            * @param int[] $convc
+            * @param float[] $areac
+            */
             $opti_penalty = function (
-                $path,
-                $i,
-                $j,
-                $res,
-                $opttolerance,
-                $convc,
-                $areac
+                Path $path,
+                float $i,
+                float $j,
+                Opti $res,
+                float $opttolerance,
+                array $convc,
+                array $areac
             ) use (
                 $mod,
                 $ddist,
@@ -984,9 +1037,17 @@ class Potracio
                 $bezier,
                 $iprod,
                 $iprod1
-            ) {
-                $m = $path->curve->n;
+            ) : int {
+                /**
+                * @var Curve $curve
+                */
                 $curve = $path->curve;
+
+                /**
+                * @var int $m
+                */
+                $m = $curve->n;
+
                 $vertex = $curve->vertex;
                 if ($i === $j) {
                     return 1;
@@ -999,7 +1060,7 @@ class Potracio
                 if (0 === $conv) {
                     return 1;
                 }
-                $d = $ddist($vertex[$i], $vertex[$i1]);
+                $d =     $ddist($vertex[$i], $vertex[$i1]);
                 for ($k = $k1; $k !== $j; $k = $k1) {
                     $k1 = $mod($k + 1, $m);
                     $k2 = $mod($k + 2, $m);
@@ -1158,12 +1219,19 @@ class Potracio
                 return 0;
             };
 
+            /**
+            * @var Curve $curve
+            */
             $curve = $path->curve;
             $m = $curve->n;
             $vert = $curve->vertex;
             $pt = array_fill(0, $m + 1, null);
             $pen = array_fill(0, $m + 1, null);
             $len = array_fill(0, $m + 1, null);
+
+            /**
+            * @var (Opti|null)[]
+            */
             $opt = array_fill(0, $m + 1, null);
             $o = new Opti();
 
@@ -1227,7 +1295,7 @@ class Potracio
                         $i,
                         $mod($j, $m),
                         $o,
-                        $info->opttolerance,
+                        $info['opttolerance'],
                         $convc,
                         $areac
                     );
@@ -1268,18 +1336,22 @@ class Potracio
                     $s[$i] = $t[$i] = 1.0;
                 } else {
                     $ocurve->tag[$i] = 'CURVE';
-                    $ocurve->c[$i * 3 + 0] = $opt[$j]->c[0];
-                    $ocurve->c[$i * 3 + 1] = $opt[$j]->c[1];
+                    /**
+                    * @var Opti $opti
+                    */
+                    $opti = $opt[$j];
+                    $ocurve->c[$i * 3 + 0] = $opti->c[0];
+                    $ocurve->c[$i * 3 + 1] = $opti->c[1];
                     $ocurve->c[$i * 3 + 2] = $curve->c[$mod($j, $m) * 3 + 2];
                     $ocurve->vertex[$i] = $interval(
-                        $opt[$j]->s,
+                        $opti->s,
                         $curve->c[$mod($j, $m) * 3 + 2],
                         $vert[$mod($j, $m)]
                     );
-                    $ocurve->alpha[$i] = $opt[$j]->alpha;
-                    $ocurve->alpha0[$i] = $opt[$j]->alpha;
-                    $s[$i] = $opt[$j]->s;
-                    $t[$i] = $opt[$j]->t;
+                    $ocurve->alpha[$i] = $opti->alpha;
+                    $ocurve->alpha0[$i] = $opti->alpha;
+                    $s[$i] = $opti->s;
+                    $t[$i] = $opti->t;
                 }
                 $j = $pt[$j];
             }
@@ -1292,7 +1364,7 @@ class Potracio
                     $ocurve->beta[$i] = null; // TODO Hack para evitar división por 0
                 }
             }
-            $ocurve->alphacurve = 1;
+            $ocurve->alphaCurve = 1;
             $path->curve = $ocurve;
         };
 

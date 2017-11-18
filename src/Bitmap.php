@@ -9,25 +9,40 @@ namespace Potracio;
 
 class Bitmap
 {
-    public $w;
-    public $h;
-    public $size;
-    public $data;
+    /**
+    * @var int
+    */
+    public $w = 0;
 
-    public function __construct($w, $h)
+    /**
+    * @var int
+    */
+    public $h = 0;
+
+    /**
+    * @var int
+    */
+    public $size;
+
+    /**
+    * @var int[]
+    */
+    public $data = [];
+
+    public function __construct(int $w, int $h)
     {
         $this->w = $w;
         $this->h = $h;
         $this->size = $w * $h;
     }
 
-    public function at($x, $y)
+    public function at(int $x, int $y) : bool
     {
         return ($x >= 0 && $x < $this->w && $y >= 0 && $y < $this->h) &&
                     1 === $this->data[$this->w * $y + $x];
     }
 
-    public function index($i)
+    public function index(int $i) : Point
     {
         $point = new Point();
         $point->y = floor($i / $this->w);
@@ -36,12 +51,12 @@ class Bitmap
         return $point;
     }
 
-    public function flip($x, $y)
+    public function flip(float $x, float $y)
     {
-        if ($this->at($x, $y)) {
-            $this->data[$this->w * $y + $x] = 0;
+        if ($this->at((int) $x, (int) $y)) {
+            $this->data[(int) ($this->w * $y + $x)] = 0;
         } else {
-            $this->data[$this->w * $y + $x] = 1;
+            $this->data[(int) ($this->w * $y + $x)] = 1;
         }
     }
 }
