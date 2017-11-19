@@ -101,60 +101,64 @@ class Potracio
         $this->bm = null;
         $this->pathlist = [];
     }
-    private function bezier(int $i, Curve $curve, int $size) : string {
-                $b =
-                    'C ' .
-                    number_format($curve->c[$i * 3 + 0]->x * $size, 3) .
-                    ' ' .
-                    number_format($curve->c[$i * 3 + 0]->y * $size, 3) .
-                    ',';
-                $b .=
-                    number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
-                    ' ' .
-                    number_format($curve->c[$i * 3 + 1]->y * $size, 3) .
-                    ',';
-                $b .=
-                    number_format($curve->c[$i * 3 + 2]->x * $size, 3) .
-                    ' ' .
-                    number_format($curve->c[$i * 3 + 2]->y * $size, 3) .
-                    ' ';
+    private function bezier(int $i, Curve $curve, int $size) : string
+    {
+        $b =
+            'C ' .
+            number_format($curve->c[$i * 3 + 0]->x * $size, 3) .
+            ' ' .
+            number_format($curve->c[$i * 3 + 0]->y * $size, 3) .
+            ',';
+        $b .=
+            number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
+            ' ' .
+            number_format($curve->c[$i * 3 + 1]->y * $size, 3) .
+            ',';
+        $b .=
+            number_format($curve->c[$i * 3 + 2]->x * $size, 3) .
+            ' ' .
+            number_format($curve->c[$i * 3 + 2]->y * $size, 3) .
+            ' ';
 
-                return $b;
-    }
-    private function segment(int $i, Curve $curve, int $size) : string {
-                $s =
-                    'L ' .
-                    number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
-                    ' ' .
-                    number_format($curve->c[$i * 3 + 1]->y * $size, 3) .
-                    ' ';
-                $s .=
-                    number_format($curve->c[$i * 3 + 2]->x * $size, 3) .
-                    ' ' .
-                    number_format($curve->c[$i * 3 + 2]->y * $size, 3) .
-                    ' ';
-
-                return $s;
+        return $b;
     }
 
-    private function path(Curve $curve, int $size) : string {
-            $n = $curve->n;
-            $p =
-                'M' .
-                number_format($curve->c[($n - 1) * 3 + 2]->x * $size, 3) .
-                ' ' .
-                number_format($curve->c[($n - 1) * 3 + 2]->y * $size, 3) .
-                ' ';
+    private function segment(int $i, Curve $curve, int $size) : string
+    {
+        $s =
+            'L ' .
+            number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
+            ' ' .
+            number_format($curve->c[$i * 3 + 1]->y * $size, 3) .
+            ' ';
+        $s .=
+            number_format($curve->c[$i * 3 + 2]->x * $size, 3) .
+            ' ' .
+            number_format($curve->c[$i * 3 + 2]->y * $size, 3) .
+            ' ';
 
-            for ($i = 0; $i < $n; ++$i) {
-                if ('CURVE' === $curve->tag[$i]) {
-                    $p .= $this->bezier($i, $curve, $size);
-                } elseif ('CORNER' === $curve->tag[$i]) {
-                    $p .= $this->segment($i, $curve, $size);
-                }
+        return $s;
+    }
+
+    private function path(Curve $curve, int $size) : string
+    {
+        $n = $curve->n;
+        $p =
+            'M' .
+            number_format($curve->c[($n - 1) * 3 + 2]->x * $size, 3) .
+            ' ' .
+            number_format($curve->c[($n - 1) * 3 + 2]->y * $size, 3) .
+            ' ';
+
+        for ($i = 0; $i < $n; ++$i) {
+            if ('CURVE' === $curve->tag[$i]) {
+                $p .= $this->bezier($i, $curve, $size);
+            } elseif ('CORNER' === $curve->tag[$i]) {
+                $p .= $this->segment($i, $curve, $size);
             }
-            //p +=
-            return $p;
+        }
+        //p +=
+        return $p;
     }
 
 
