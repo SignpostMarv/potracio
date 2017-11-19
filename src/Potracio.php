@@ -209,169 +209,169 @@ class Potracio
         return $p;
     }
 
-            /**
-            * @return int|Point
-            */
+    /**
+    * @return int|Point
+    */
     private function findNext(Point $point, Bitmap $bm1)
     {
-                $i = (int) ($bm1->w * $point->y + $point->x);
-                while ($i < $bm1->size && 1 !== $bm1->data[$i]) {
-                    ++$i;
-                }
-                if ($i < $bm1->size) {
-                    return $bm1->index($i);
-                }
+        $i = (int) ($bm1->w * $point->y + $point->x);
+        while ($i < $bm1->size && 1 !== $bm1->data[$i]) {
+            ++$i;
+        }
+        if ($i < $bm1->size) {
+            return $bm1->index($i);
+        }
 
-                return 0;
+        return 0;
     }
 
     private function majority(float $x, float $y, Bitmap $bm1) : int
     {
-            for ($i = 2; $i < 5; ++$i) {
-                $ct = 0;
-                for ($a = -$i + 1; $a <= $i - 1; ++$a) {
-                    $ct +=
-                        $bm1->at(
-                            (int) ($x + $a),
-                            (int) ($y + $i - 1)
-                        )
-                            ? 1
-                            : -1;
-                    $ct +=
-                        $bm1->at(
-                            (int) ($x + $i - 1),
-                            (int) ($y + $a - 1)
-                        )
-                            ? 1
-                            : -1;
-                    $ct +=
-                        $bm1->at(
-                            (int) ($x + $a - 1),
-                            (int) ($y - $i)
-                        )
-                            ? 1
-                            : -1;
-                    $ct +=
-                        $bm1->at(
-                            (int) ($x - $i),
-                            (int) ($y + $a)
-                        )
-                            ? 1
-                            : -1;
-                }
-                if ($ct > 0) {
-                    return 1;
-                } elseif ($ct < 0) {
-                    return 0;
-                }
+        for ($i = 2; $i < 5; ++$i) {
+            $ct = 0;
+            for ($a = -$i + 1; $a <= $i - 1; ++$a) {
+                $ct +=
+                    $bm1->at(
+                        (int) ($x + $a),
+                        (int) ($y + $i - 1)
+                    )
+                        ? 1
+                        : -1;
+                $ct +=
+                    $bm1->at(
+                        (int) ($x + $i - 1),
+                        (int) ($y + $a - 1)
+                    )
+                        ? 1
+                        : -1;
+                $ct +=
+                    $bm1->at(
+                        (int) ($x + $a - 1),
+                        (int) ($y - $i)
+                    )
+                        ? 1
+                        : -1;
+                $ct +=
+                    $bm1->at(
+                        (int) ($x - $i),
+                        (int) ($y + $a)
+                    )
+                        ? 1
+                        : -1;
             }
+            if ($ct > 0) {
+                return 1;
+            } elseif ($ct < 0) {
+                return 0;
+            }
+        }
 
-            return 0;
+        return 0;
     }
 
-    private function findPath(Point $point, Bitmap $bm, Bitmap $bm1
-        ) : Path {
-            $path = new Path();
-            $x = $point->x;
-            $y = $point->y;
-            $dirx = 0;
-            $diry = 1;
+    private function findPath(Point $point, Bitmap $bm, Bitmap $bm1) : Path
+    {
+        $path = new Path();
+        $x = $point->x;
+        $y = $point->y;
+        $dirx = 0;
+        $diry = 1;
 
-            $path->sign = $bm->at((int) $point->x, (int) $point->y) ? '+' : '-';
+        $path->sign = $bm->at((int) $point->x, (int) $point->y) ? '+' : '-';
 
-            while (1) {
-                $path->pt[] = new Point($x, $y);
-                if ($x > $path->maxX) {
-                    $path->maxX = $x;
-                }
-                if ($x < $path->minX) {
-                    $path->minX = $x;
-                }
-                if ($y > $path->maxY) {
-                    $path->maxY = $y;
-                }
-                if ($y < $path->minY) {
-                    $path->minY = $y;
-                }
-                ++$path->len;
+        while (1) {
+            $path->pt[] = new Point($x, $y);
+            if ($x > $path->maxX) {
+                $path->maxX = $x;
+            }
+            if ($x < $path->minX) {
+                $path->minX = $x;
+            }
+            if ($y > $path->maxY) {
+                $path->maxY = $y;
+            }
+            if ($y < $path->minY) {
+                $path->minY = $y;
+            }
+            ++$path->len;
 
-                $x += $dirx;
-                $y += $diry;
-                $path->area -= $x * $diry;
+            $x += $dirx;
+            $y += $diry;
+            $path->area -= $x * $diry;
 
-                if ($x === $point->x && $y === $point->y) {
-                    break;
-                }
+            if ($x === $point->x && $y === $point->y) {
+                break;
+            }
 
-                $l = $bm1->at(
-                    (int) ($x + ($dirx + $diry - 1) / 2),
-                    (int) ($y + ($diry - $dirx - 1) / 2)
-                );
-                $r = $bm1->at(
-                    (int) ($x + ($dirx - $diry - 1) / 2),
-                    (int) ($y + ($diry + $dirx - 1) / 2)
-                );
+            $l = $bm1->at(
+                (int) ($x + ($dirx + $diry - 1) / 2),
+                (int) ($y + ($diry - $dirx - 1) / 2)
+            );
+            $r = $bm1->at(
+                (int) ($x + ($dirx - $diry - 1) / 2),
+                (int) ($y + ($diry + $dirx - 1) / 2)
+            );
 
-                if ($r && ! $l) {
-                    if (
-                        'right' === $this->info['turnpolicy'] ||
-                        (
-                            'black' === $this->info['turnpolicy'] &&
-                            '+' === $path->sign
-                        ) ||
-                        (
-                            'white' === $this->info['turnpolicy'] &&
-                            '-' === $path->sign
-                        ) ||
-                        (
-                            'majority' === $this->info['turnpolicy'] &&
-                            $this->majority($x, $y, $bm1)
-                        ) ||
-                        (
-                            'minority' === $this->info['turnpolicy'] &&
-                            ! $this->majority($x, $y, $bm1)
-                        )
-                    ) {
-                        $tmp = $dirx;
-                        $dirx = -$diry;
-                        $diry = $tmp;
-                    } else {
-                        $tmp = $dirx;
-                        $dirx = $diry;
-                        $diry = -$tmp;
-                    }
-                } elseif ($r) {
+            if ($r && ! $l) {
+                if (
+                    'right' === $this->info['turnpolicy'] ||
+                    (
+                        'black' === $this->info['turnpolicy'] &&
+                        '+' === $path->sign
+                    ) ||
+                    (
+                        'white' === $this->info['turnpolicy'] &&
+                        '-' === $path->sign
+                    ) ||
+                    (
+                        'majority' === $this->info['turnpolicy'] &&
+                        $this->majority($x, $y, $bm1)
+                    ) ||
+                    (
+                        'minority' === $this->info['turnpolicy'] &&
+                        ! $this->majority($x, $y, $bm1)
+                    )
+                ) {
                     $tmp = $dirx;
                     $dirx = -$diry;
                     $diry = $tmp;
-                } elseif ( ! $l) {
+                } else {
                     $tmp = $dirx;
                     $dirx = $diry;
                     $diry = -$tmp;
                 }
+            } elseif ($r) {
+                $tmp = $dirx;
+                $dirx = -$diry;
+                $diry = $tmp;
+            } elseif ( ! $l) {
+                $tmp = $dirx;
+                $dirx = $diry;
+                $diry = -$tmp;
             }
+        }
 
-            return $path;
+        return $path;
     }
 
     private function xorPath(Path $path, Bitmap $bm1)
     {
-            $y1 = $path->pt[0]->y;
-            $len = $path->len;
+        $y1 = $path->pt[0]->y;
+        $len = $path->len;
 
-            for ($i = 1; $i < $len; ++$i) {
-                $x = $path->pt[$i]->x;
-                $y = $path->pt[$i]->y;
+        for ($i = 1; $i < $len; ++$i) {
+            $x = $path->pt[$i]->x;
+            $y = $path->pt[$i]->y;
 
-                if ($y !== $y1) {
-                    $minY = $y1 < $y ? $y1 : $y;
-                    $maxX = $path->maxX;
-                    for ($j = $x; $j < $maxX; ++$j) {
-                        $bm1->flip($j, $minY);
-                    }
-                    $y1 = $y;
+            if ($y !== $y1) {
+                $minY = $y1 < $y ? $y1 : $y;
+                $maxX = $path->maxX;
+                for ($j = $x; $j < $maxX; ++$j) {
+                    $bm1->flip($j, $minY);
                 }
+                $y1 = $y;
             }
+        }
     }
 
     private function bmToPathlist()
