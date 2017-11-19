@@ -101,6 +101,54 @@ class Potracio
         $this->bm = null;
         $this->pathlist = [];
     }
+
+    public function getSVG(int $size, string $opt_type = '') : string
+    {
+        /**
+        * @var Bitmap $bm
+        */
+        $bm = &$this->bm;
+        $pathlist = &$this->pathlist;
+
+        $w = $bm->w * $size;
+        $h = $bm->h * $size;
+        $len = count($pathlist);
+
+        $svg =
+            '<svg id="svg" version="1.1" width="' .
+            $w .
+            '" height="' .
+            $h .
+            '" xmlns="http://www.w3.org/2000/svg">';
+        $svg .= '<path d="';
+        for ($i = 0; $i < $len; ++$i) {
+            /**
+            * @var Curve $c
+            */
+            $c = $pathlist[$i]->curve;
+            $svg .= $this->path($c, $size);
+        }
+        if ('curve' === $opt_type) {
+            $strokec = 'black';
+            $fillc = 'none';
+            $fillrule = '';
+        } else {
+            $strokec = 'none';
+            $fillc = 'black';
+            $fillrule = ' fill-rule="evenodd"';
+        }
+        $svg .=
+            '" stroke="' .
+            $strokec .
+            '" fill="' .
+            $fillc .
+            '"' .
+            $fillrule .
+            '/></svg>';
+
+        return $svg;
+    }
+
     private function bezier(int $i, Curve $curve, int $size) : string
     {
         $b =
@@ -159,54 +207,6 @@ class Potracio
         }
         //p +=
         return $p;
-    }
-
-
-    public function getSVG(int $size, string $opt_type = '') : string
-    {
-        /**
-        * @var Bitmap $bm
-        */
-        $bm = &$this->bm;
-        $pathlist = &$this->pathlist;
-
-        $w = $bm->w * $size;
-        $h = $bm->h * $size;
-        $len = count($pathlist);
-
-        $svg =
-            '<svg id="svg" version="1.1" width="' .
-            $w .
-            '" height="' .
-            $h .
-            '" xmlns="http://www.w3.org/2000/svg">';
-        $svg .= '<path d="';
-        for ($i = 0; $i < $len; ++$i) {
-            /**
-            * @var Curve $c
-            */
-            $c = $pathlist[$i]->curve;
-            $svg .= $this->path($c, $size);
-        }
-        if ('curve' === $opt_type) {
-            $strokec = 'black';
-            $fillc = 'none';
-            $fillrule = '';
-        } else {
-            $strokec = 'none';
-            $fillc = 'black';
-            $fillrule = ' fill-rule="evenodd"';
-        }
-        $svg .=
-            '" stroke="' .
-            $strokec .
-            '" fill="' .
-            $fillc .
-            '"' .
-            $fillrule .
-            '/></svg>';
-
-        return $svg;
     }
 
     private function bmToPathlist()
