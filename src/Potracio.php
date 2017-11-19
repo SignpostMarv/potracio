@@ -101,16 +101,7 @@ class Potracio
         $this->bm = null;
         $this->pathlist = [];
     }
-
-    public function getSVG(int $size, string $opt_type = '') : string
-    {
-        /**
-        * @var Bitmap $bm
-        */
-        $bm = &$this->bm;
-        $pathlist = &$this->pathlist;
-        $path = function (Curve $curve) use ($size) : string {
-            $bezier = function (int $i) use ($curve, $size) : string {
+    private function bezier(int $i, Curve $curve, int $size) : string {
                 $b =
                     'C ' .
                     number_format($curve->c[$i * 3 + 0]->x * $size, 3) .
@@ -129,9 +120,8 @@ class Potracio
                     ' ';
 
                 return $b;
-            };
-
-            $segment = function (int $i) use ($curve, $size) : string {
+    }
+    private function segment(int $i, Curve $curve, int $size) : string {
                 $s =
                     'L ' .
                     number_format($curve->c[$i * 3 + 1]->x * $size, 3) .
@@ -145,8 +135,9 @@ class Potracio
                     ' ';
 
                 return $s;
-            };
+    }
 
+    private function path(Curve $curve, int $size) : string {
             $n = $curve->n;
             $p =
                 'M' .
@@ -157,14 +148,23 @@ class Potracio
 
             for ($i = 0; $i < $n; ++$i) {
                 if ('CURVE' === $curve->tag[$i]) {
-                    $p .= $bezier($i);
+                    $p .= $this->bezier($i, $curve, $size);
                 } elseif ('CORNER' === $curve->tag[$i]) {
-                    $p .= $segment($i);
+                    $p .= $this->segment($i, $curve, $size);
                 }
             }
             //p +=
             return $p;
-        };
+    }
+
+
+    public function getSVG(int $size, string $opt_type = '') : string
+    {
+        /**
+        * @var Bitmap $bm
+        */
+        $bm = &$this->bm;
+        $pathlist = &$this->pathlist;
 
         $w = $bm->w * $size;
         $h = $bm->h * $size;
@@ -182,7 +182,7 @@ class Potracio
             * @var Curve $c
             */
             $c = $pathlist[$i]->curve;
-            $svg .= $path($c);
+            $svg .= $this->path($c, $size);
         }
         if ('curve' === $opt_type) {
             $strokec = 'black';
