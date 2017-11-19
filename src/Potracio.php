@@ -209,21 +209,11 @@ class Potracio
         return $p;
     }
 
-    private function bmToPathlist()
-    {
-        $info = $this->info;
-        /**
-        * @var Bitmap $bm
-        **/
-        $bm = &$this->bm;
-        $bm1 = clone $bm;
-        $currentPoint = new Point(0, 0);
-
-        $findNext =
             /**
             * @return int|Point
             */
-            function (Point $point) use ($bm1) {
+    private function findNext(Point $point, Bitmap $bm1)
+    {
                 $i = (int) ($bm1->w * $point->y + $point->x);
                 while ($i < $bm1->size && 1 !== $bm1->data[$i]) {
                     ++$i;
@@ -233,9 +223,10 @@ class Potracio
                 }
 
                 return 0;
-            };
+    }
 
-        $majority = function (float $x, float $y) use ($bm1) : int {
+    private function majority(float $x, float $y, Bitmap $bm1) : int
+    {
             for ($i = 2; $i < 5; ++$i) {
                 $ct = 0;
                 for ($a = -$i + 1; $a <= $i - 1; ++$a) {
@@ -276,15 +267,9 @@ class Potracio
             }
 
             return 0;
-        };
+    }
 
-        $findPath = function (
-            Point $point
-        ) use (
-            $bm,
-            $bm1,
-            $majority,
-            $info
+    private function findPath(Point $point, Bitmap $bm, Bitmap $bm1
         ) : Path {
             $path = new Path();
             $x = $point->x;
@@ -329,22 +314,22 @@ class Potracio
 
                 if ($r && ! $l) {
                     if (
-                        'right' === $info['turnpolicy'] ||
+                        'right' === $this->info['turnpolicy'] ||
                         (
-                            'black' === $info['turnpolicy'] &&
+                            'black' === $this->info['turnpolicy'] &&
                             '+' === $path->sign
                         ) ||
                         (
-                            'white' === $info['turnpolicy'] &&
+                            'white' === $this->info['turnpolicy'] &&
                             '-' === $path->sign
                         ) ||
                         (
-                            'majority' === $info['turnpolicy'] &&
-                            $majority($x, $y)
+                            'majority' === $this->info['turnpolicy'] &&
+                            $this->majority($x, $y, $bm1)
                         ) ||
                         (
-                            'minority' === $info['turnpolicy'] &&
-                            ! $majority($x, $y)
+                            'minority' === $this->info['turnpolicy'] &&
+                            ! $this->majority($x, $y, $bm1)
                         )
                     ) {
                         $tmp = $dirx;
@@ -367,9 +352,10 @@ class Potracio
             }
 
             return $path;
-        };
+    }
 
-        $xorPath = function (Path $path) use (&$bm1) {
+    private function xorPath(Path $path, Bitmap $bm1)
+    {
             $y1 = $path->pt[0]->y;
             $len = $path->len;
 
@@ -386,18 +372,27 @@ class Potracio
                     $y1 = $y;
                 }
             }
-        };
+    }
 
-        while ($currentPoint = $findNext($currentPoint)) {
+    private function bmToPathlist()
+    {
+        /**
+        * @var Bitmap $bm
+        **/
+        $bm = &$this->bm;
+        $bm1 = clone $bm;
+        $currentPoint = new Point(0, 0);
+
+        while ($currentPoint = $this->findNext($currentPoint, $bm1)) {
             /**
             * @var Point $currentPoint
             */
             $currentPoint = $currentPoint;
-            $path = $findPath($currentPoint);
+            $path = $this->findPath($currentPoint, $bm, $bm1);
 
-            $xorPath($path);
+            $this->xorPath($path, $bm1);
 
-            if ($path->area > $info['turdsize']) {
+            if ($path->area > $this->info['turdsize']) {
                 $this->pathlist[] = $path;
             }
         }
